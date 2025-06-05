@@ -4,13 +4,13 @@ const http = require("http"),
 
 http
   .createServer((request, response) => {
-    let addr = request.url,
-      q = new URL(addr, "http://" + request.headers.host),
+    let urlPath = request.url,
+      q = new URL(urlPath, "http://" + request.headers.host),
       filePath = "";
 
     fs.appendFile(
       "log.txt",
-      "URL: " + addr + "\nTimestamp: " + new Date() + "\n\n",
+      "URL: " + urlPath + "\nTimestamp: " + new Date() + "\n\n",
       (err) => {
         if (err) {
           console.log(err);
