@@ -1,63 +1,69 @@
+const bodyParser = require('body-parser');
 const express = require('express'),
-  morgan = require('morgan');
+  morgan = require('morgan'),
+  uuid = require('uuid');
 
 const fs = require('fs');
 const path = require('path');
 
 const app = express();
 
+app.use(bodyParser.json());
+
 app.use(morgan('common'));
 
-let bestPicture = [
+let users = [
+  {
+    name: 'Jack',
+    favoriteMovie: ['Fight Club'],
+    id: 1,
+  },
+
+  {
+    name: 'Sara',
+    favoriteMovie: ['Lilo & Stitch'],
+    id: 2,
+  },
+];
+
+let movies = [
   {
     title: 'A Beautiful Mind',
-    director: 'Ron Howard',
+    director: {
+      name: 'Ron Howard',
+    },
     year: '2001',
+    genre: {
+      name: 'Drama',
+      description:
+        'A drama is a genre that focuses on realistic characters, emotional themes, and intense, often personal conflicts to explore the human experience.',
+    },
   },
-  {
-    title: 'Chicago',
-    director: 'Rob Marshall',
-    year: '2002',
-  },
+
   {
     title: 'The Lord of the Rings: The Return of the King',
-    director: 'Peter Jackson',
+    director: {
+      name: 'Peter Jackson',
+    },
     year: '2003',
+    genre: {
+      name: 'Fantasy',
+      description:
+        'Fantasy is a genre that features magical or supernatural elements set in imaginary worlds, often involving epic quests, mythical creatures, and heroic characters.',
+    },
   },
-  {
-    title: 'Million Dollar Baby',
-    director: 'Clint Eastwood',
-    year: '2004',
-  },
-  {
-    title: 'Crash',
-    director: 'Paul Haggis',
-    year: '2004',
-  },
-  {
-    title: 'The Departed',
-    director: 'Martin Scorsese',
-    year: '2005',
-  },
+
   {
     title: 'No Country for Old Men',
-    director: 'Joel and Ethan Coen',
-    year: '2006',
-  },
-  {
-    title: 'Slumdog Millionaire',
-    director: 'Danny Boyle',
+    director: {
+      name: 'Joel and Ethan Coen',
+    },
     year: '2007',
-  },
-  {
-    title: 'The Hurt Locker',
-    director: 'Kathryn Bigelow',
-    year: '2008',
-  },
-  {
-    title: 'The King’s Speech',
-    director: 'Tom Hooper',
-    year: '2009',
+    genre: {
+      name: 'Thriller',
+      description:
+        'A thriller is a genre built around suspense, tension, and high stakes, keeping audiences on edge through twists, danger, and psychological intensity.',
+    },
   },
 ];
 
@@ -69,12 +75,124 @@ app.use(morgan('combined', { stream: accessLogStream }));
 
 app.use(express.static('public'));
 
-app.get('/', (req, res) => {
-  res.send('Who wants to watch a movie?');
+//Create user data
+app.post('/users', (req, res) => {
+  const newUser = req.body;
+
+  if (newUser.name) {
+    newUser.id = uuid.v4();
+    users.push(newUser);
+    res.status(201).json(newUser);
+  } else {
+    res.status(400).send('User Name Required');
+  }
 });
 
+//Update user data
+app.put('/users/:id', (req, res) => {
+  const { id } = req.params;
+  const updatedUser = req.body;
+
+  let user = users.find((user) => user.id == id);
+
+  if (user) {
+    user.name = updatedUser.name;
+    res.status(200).json(user);
+  } else {
+    res.status(400).send('User Not Found');
+  }
+});
+
+//Add favorite movie
+app.post('/users/:id/:movieTitle', (req, res) => {
+  const { id, movieTitle } = req.params;
+
+  let user = users.find((user) => user.id == id);
+
+  if (user) {
+    user.favoriteMovie.push(movieTitle);
+    res.status(200).send(`${movieTitle} has been added to user ${id} array`);
+  } else {
+    res.status(400).send('Movie Not Found');
+  }
+});
+
+//Delete user movie
+app.delete('/users/:id/:movieTitle', (req, res) => {
+  const { id, movieTitle } = req.params;
+
+  let user = users.find((user) => user.id == id);
+
+  if (user) {
+    user.favoriteMovie = user.favoriteMovie.filter(
+      (title) => title !== movieTitle
+    );
+    res.status(200).send(`${movieTitle} has been removed to user ${id} array`);
+  } else {
+    res.status(400).send('User Not Found');
+  }
+});
+
+//Delete user data
+app.delete('/users/:id', (req, res) => {
+  const { id } = req.params;
+
+  let user = users.find((user) => user.id == id);
+
+  if (user) {
+    users = users.filter((users) => users.id != id);
+    res.status(200).send(`User ${id} has been removed`);
+  } else {
+    res.status(400).send('User Not Found');
+  }
+});
+
+//Read data of all users
+app.get('/users', (req, res) => {
+  res.status(200).json(users);
+});
+
+//Read data of all movies
 app.get('/movies', (req, res) => {
-  res.json(bestPicture);
+  res.status(200).json(movies);
+});
+
+//Read data of one movie
+app.get('/movies/:title', (req, res) => {
+  const { title } = req.params;
+  const movie = movies.find((movie) => movie.title === title);
+
+  if (movie) {
+    res.status(200).json(movie);
+  } else {
+    res.status(400).send('Movie Not Found');
+  }
+});
+
+//Read genre data
+app.get('/movies/genre/:genreName', (req, res) => {
+  const { genreName } = req.params;
+  const genre = movies.find((movie) => movie.genre.name === genreName).genre;
+
+  if (genre) {
+    res.status(200).json(genre);
+  } else {
+    res.status(400).send('Genre Not Found');
+  }
+});
+
+//Read director data
+app.get('/movies/director/:directorName', (req, res) => {
+  const { directorName } = req.params;
+  const director = movies.find(
+    (movie) => movie.director.name === directorName
+  ).director;
+
+  if (director) {
+    res.status(200).json(director);
+  } else {
+    res.status(400).send('Director Not Found');
+  }
 });
 
 app.use((err, req, res, next) => {
