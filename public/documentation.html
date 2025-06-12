@@ -20,9 +20,20 @@
           version: "1.0.0",
           description: "Documentation for user and movie endpoints.",
         },
+        tags: [
+          {
+            name: "Users",
+            description: "Operations related to user accounts",
+          },
+          {
+            name: "Movies",
+            description: "Operations related to movie records",
+          },
+        ],
         paths: {
           "/users": {
             get: {
+              tags: ["Users"],
               summary: "Get all users",
               responses: {
                 200: {
@@ -49,6 +60,7 @@
               },
             },
             post: {
+              tags: ["Users"],
               summary: "Create a new user",
               requestBody: {
                 required: true,
@@ -81,6 +93,7 @@
           },
           "/users/{id}": {
             put: {
+              tags: ["Users"],
               summary: "Update user data",
               parameters: [
                 {
@@ -109,6 +122,7 @@
               },
             },
             delete: {
+              tags: ["Users"],
               summary: "Delete user data",
               parameters: [
                 {
@@ -126,6 +140,7 @@
           },
           "/users/{id}/{movieTitle}": {
             post: {
+              tags: ["Movies"],
               summary: "Add a movie to a user's favoriteMovie array",
               parameters: [
                 {
@@ -147,6 +162,7 @@
               },
             },
             delete: {
+              tags: ["Movies"],
               summary: "Remove a movie from a user's favoriteMovie array",
               parameters: [
                 {
@@ -170,6 +186,7 @@
           },
           "/movies": {
             get: {
+              tags: ["Movies"],
               summary: "Get all movies",
               responses: {
                 200: {
@@ -207,6 +224,7 @@
           },
           "/movies/{title}": {
             get: {
+              tags: ["Movies"],
               summary: "Get movie by title",
               parameters: [
                 {
@@ -224,6 +242,7 @@
           },
           "/movies/genre/{genreName}": {
             get: {
+              tags: ["Movies"],
               summary: "Get genre data by genre name",
               parameters: [
                 {
@@ -241,6 +260,7 @@
           },
           "/movies/director/{directorName}": {
             get: {
+              tags: ["Movies"],
               summary: "Get director data by name",
               parameters: [
                 {
