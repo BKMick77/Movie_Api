@@ -1,9 +1,11 @@
 {
-  "name": "my-first-package",
+  "name": "movie-api",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js",
+    "dev": "nodemon index.js"
   },
   "keywords": [],
   "author": "",
@@ -13,9 +15,11 @@
     "body-parser": "^2.2.0",
     "express": "^5.1.0",
     "lodash": "^4.17.21",
-    "morgan": "^1.10.0"
+    "morgan": "^1.10.0",
+    "uuid": "^11.1.0"
   },
   "devDependencies": {
-    "eslint": "^9.28.0"
+    "eslint": "^9.28.0",
+    "nodemon": "^3.1.10"
   }
 }
