@@ -1,4 +1,14 @@
-const bodyParser = require('body-parser');
+const mongoose = require('mongoose');
+const models = require('./models.js');
+
+const Movies = models.Movie;
+const Users = models.User;
+
+mongoose.connect('mongodb://localhost:27017/movie_api', {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
+
 const express = require('express'),
   morgan = require('morgan'),
   uuid = require('uuid');
@@ -8,64 +18,65 @@ const path = require('path');
 
 const app = express();
 
-app.use(bodyParser.json());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 app.use(morgan('common'));
 
-let users = [
-  {
-    name: 'Jack',
-    favoriteMovie: ['Fight Club'],
-    id: 1,
-  },
+// let users = [
+//   {
+//     name: 'Jack',
+//     favoriteMovie: ['Fight Club'],
+//     id: 1,
+//   },
 
-  {
-    name: 'Sara',
-    favoriteMovie: ['Lilo & Stitch'],
-    id: 2,
-  },
-];
+//   {
+//     name: 'Sara',
+//     favoriteMovie: ['Lilo & Stitch'],
+//     id: 2,
+//   },
+// ];
 
-let movies = [
-  {
-    title: 'A Beautiful Mind',
-    director: {
-      name: 'Ron Howard',
-    },
-    year: '2001',
-    genre: {
-      name: 'Drama',
-      description:
-        'A drama is a genre that focuses on realistic characters, emotional themes, and intense, often personal conflicts to explore the human experience.',
-    },
-  },
+// let movies = [
+//   {
+//     title: 'A Beautiful Mind',
+//     director: {
+//       name: 'Ron Howard',
+//     },
+//     year: '2001',
+//     genre: {
+//       name: 'Drama',
+//       description:
+//         'A drama is a genre that focuses on realistic characters, emotional themes, and intense, often personal conflicts to explore the human experience.',
+//     },
+//   },
 
-  {
-    title: 'The Lord of the Rings: The Return of the King',
-    director: {
-      name: 'Peter Jackson',
-    },
-    year: '2003',
-    genre: {
-      name: 'Fantasy',
-      description:
-        'Fantasy is a genre that features magical or supernatural elements set in imaginary worlds, often involving epic quests, mythical creatures, and heroic characters.',
-    },
-  },
+//   {
+//     title: 'The Lord of the Rings: The Return of the King',
+//     director: {
+//       name: 'Peter Jackson',
+//     },
+//     year: '2003',
+//     genre: {
+//       name: 'Fantasy',
+//       description:
+//         'Fantasy is a genre that features magical or supernatural elements set in imaginary worlds, often involving epic quests, mythical creatures, and heroic characters.',
+//     },
+//   },
 
-  {
-    title: 'No Country for Old Men',
-    director: {
-      name: 'Joel and Ethan Coen',
-    },
-    year: '2007',
-    genre: {
-      name: 'Thriller',
-      description:
-        'A thriller is a genre built around suspense, tension, and high stakes, keeping audiences on edge through twists, danger, and psychological intensity.',
-    },
-  },
-];
+//   {
+//     title: 'No Country for Old Men',
+//     director: {
+//       name: 'Joel and Ethan Coen',
+//     },
+//     year: '2007',
+//     genre: {
+//       name: 'Thriller',
+//       description:
+//         'A thriller is a genre built around suspense, tension, and high stakes, keeping audiences on edge through twists, danger, and psychological intensity.',
+//     },
+//   },
+// ];
 
 const accessLogStream = fs.createWriteStream(path.join(__dirname, 'log.txt'), {
   flags: 'a',
