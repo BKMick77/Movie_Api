@@ -16,15 +16,13 @@
       const spec = {
         openapi: "3.0.0",
         info: {
-          title: "My Flix API",
+          title: "MyFlix API",
           version: "1.0.0",
-          description: "Documentation for user and movie endpoints.",
+          description:
+            "API documentation for managing users and movies using MongoDB.",
         },
         tags: [
-          {
-            name: "Users",
-            description: "Operations related to user accounts",
-          },
+          { name: "Users", description: "Operations related to user accounts" },
           {
             name: "Movies",
             description: "Operations related to movie records",
@@ -42,17 +40,7 @@
                     "application/json": {
                       schema: {
                         type: "array",
-                        items: {
-                          type: "object",
-                          properties: {
-                            id: { type: "integer" },
-                            name: { type: "string" },
-                            favoriteMovie: {
-                              type: "array",
-                              items: { type: "string" },
-                            },
-                          },
-                        },
+                        items: { $ref: "#/components/schemas/User" },
                       },
                     },
                   },
@@ -66,121 +54,117 @@
                 required: true,
                 content: {
                   "application/json": {
-                    schema: {
-                      type: "object",
-                      required: ["name"],
-                      properties: {
-                        name: { type: "string", example: "Jack" },
-                        favoriteMovie: {
-                          type: "array",
-                          items: { type: "string" },
-                          example: ["The Matrix"],
-                        },
-                      },
-                    },
+                    schema: { $ref: "#/components/schemas/User" },
                   },
                 },
               },
               responses: {
-                201: {
-                  description: "User created",
-                },
-                400: {
-                  description: "User Name Required",
-                },
+                201: { description: "User created" },
+                400: { description: "Username already exists" },
               },
             },
           },
-          "/users/{id}": {
+          "/users/{Username}": {
+            get: {
+              tags: ["Users"],
+              summary: "Get user by username",
+              parameters: [
+                {
+                  name: "Username",
+                  in: "path",
+                  required: true,
+                  schema: { type: "string" },
+                },
+              ],
+              responses: {
+                200: { description: "User found" },
+                404: { description: "User not found" },
+              },
+            },
             put: {
               tags: ["Users"],
               summary: "Update user data",
               parameters: [
                 {
-                  name: "id",
+                  name: "Username",
                   in: "path",
                   required: true,
-                  schema: { type: "integer" },
+                  schema: { type: "string" },
                 },
               ],
               requestBody: {
                 required: true,
                 content: {
                   "application/json": {
-                    schema: {
-                      type: "object",
-                      properties: {
-                        name: { type: "string", example: "Updated Name" },
-                      },
-                    },
+                    schema: { $ref: "#/components/schemas/User" },
                   },
                 },
               },
               responses: {
                 200: { description: "User updated" },
-                400: { description: "User Not Found" },
+                404: { description: "User not found" },
               },
             },
             delete: {
               tags: ["Users"],
-              summary: "Delete user data",
+              summary: "Delete user",
               parameters: [
                 {
-                  name: "id",
+                  name: "Username",
                   in: "path",
                   required: true,
-                  schema: { type: "integer" },
+                  schema: { type: "string" },
                 },
               ],
               responses: {
                 200: { description: "User deleted" },
-                400: { description: "User Not Found" },
+                404: { description: "User not found" },
               },
             },
           },
-          "/users/{id}/{movieTitle}": {
+          "/users/{Username}/movies/{MovieID}": {
             post: {
-              tags: ["Movies"],
-              summary: "Add a movie to a user's favoriteMovie array",
+              tags: ["Users"],
+              summary: "Add a movie to user's favorites",
               parameters: [
                 {
-                  name: "id",
+                  name: "Username",
                   in: "path",
                   required: true,
-                  schema: { type: "integer" },
+                  schema: { type: "string" },
                 },
                 {
-                  name: "movieTitle",
+                  name: "MovieID",
                   in: "path",
                   required: true,
                   schema: { type: "string" },
                 },
               ],
               responses: {
-                200: { description: "Movie added" },
-                400: { description: "Movie Not Found" },
+                200: { description: "Movie added to favorites" },
+                404: { description: "User or movie not found" },
               },
             },
             delete: {
-              tags: ["Movies"],
-              summary: "Remove a movie from a user's favoriteMovie array",
+              tags: ["Users"],
+              summary: "Remove a movie from user's favorites",
               parameters: [
                 {
-                  name: "id",
+                  name: "Username",
                   in: "path",
                   required: true,
-                  schema: { type: "integer" },
+                  schema: { type: "string" },
                 },
                 {
-                  name: "movieTitle",
+                  name: "MovieID",
                   in: "path",
                   required: true,
                   schema: { type: "string" },
                 },
               ],
               responses: {
-                200: { description: "Movie removed" },
-                400: { description: "User Not Found" },
+                200: { description: "Movie removed from favorites" },
+                404: { description: "User or movie not found" },
               },
             },
           },
@@ -195,26 +179,7 @@
                     "application/json": {
                       schema: {
                         type: "array",
-                        items: {
-                          type: "object",
-                          properties: {
-                            title: { type: "string" },
-                            year: { type: "string" },
-                            director: {
-                              type: "object",
-                              properties: {
-                                name: { type: "string" },
-                              },
-                            },
-                            genre: {
-                              type: "object",
-                              properties: {
-                                name: { type: "string" },
-                                description: { type: "string" },
-                              },
-                            },
-                          },
-                        },
+                        items: { $ref: "#/components/schemas/Movie" },
                       },
                     },
                   },
@@ -222,13 +187,13 @@
               },
             },
           },
-          "/movies/{title}": {
+          "/movies/{Title}": {
             get: {
               tags: ["Movies"],
               summary: "Get movie by title",
               parameters: [
                 {
-                  name: "title",
+                  name: "Title",
                   in: "path",
                   required: true,
                   schema: { type: "string" },
@@ -236,43 +201,85 @@
               ],
               responses: {
                 200: { description: "Movie found" },
-                400: { description: "Movie Not Found" },
+                404: { description: "Movie not found" },
               },
             },
           },
-          "/movies/genre/{genreName}": {
+          "/genre/{Name}": {
             get: {
               tags: ["Movies"],
-              summary: "Get genre data by genre name",
+              summary: "Get genre description by name",
               parameters: [
                 {
-                  name: "genreName",
+                  name: "Name",
                   in: "path",
                   required: true,
                   schema: { type: "string" },
                 },
               ],
               responses: {
-                200: { description: "Genre found" },
-                400: { description: "Genre Not Found" },
+                200: { description: "Genre description returned" },
+                404: { description: "Genre not found" },
               },
             },
           },
-          "/movies/director/{directorName}": {
+          "/director/{Name}": {
             get: {
               tags: ["Movies"],
-              summary: "Get director data by name",
+              summary: "Get director information by name",
               parameters: [
                 {
-                  name: "directorName",
+                  name: "Name",
                   in: "path",
                   required: true,
                   schema: { type: "string" },
                 },
               ],
               responses: {
-                200: { description: "Director found" },
-                400: { description: "Director Not Found" },
+                200: { description: "Director info returned" },
+                404: { description: "Director not found" },
+              },
+            },
+          },
+        },
+        components: {
+          schemas: {
+            User: {
+              type: "object",
+              properties: {
+                Username: { type: "string" },
+                Password: { type: "string" },
+                Email: { type: "string" },
+                Birthday: { type: "string", format: "date" },
+                FavoriteMovies: {
+                  type: "array",
+                  items: { type: "string" },
+                },
+              },
+            },
+            Movie: {
+              type: "object",
+              properties: {
+                Title: { type: "string" },
+                Description: { type: "string" },
+                Genre: {
+                  type: "object",
+                  properties: {
+                    Name: { type: "string" },
+                    Description: { type: "string" },
+                  },
+                },
+                Director: {
+                  type: "object",
+                  properties: {
+                    Name: { type: "string" },
+                    Bio: { type: "string" },
+                    Birth: { type: "string" },
+                    Death: { type: "string", nullable: true },
+                  },
+                },
+                ImagePath: { type: "string" },
+                Featured: { type: "boolean" },
               },
             },
           },
