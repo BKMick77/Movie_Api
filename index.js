@@ -23,61 +23,6 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use(morgan('common'));
 
-// let users = [
-//   {
-//     name: 'Jack',
-//     favoriteMovie: ['Fight Club'],
-//     id: 1,
-//   },
-
-//   {
-//     name: 'Sara',
-//     favoriteMovie: ['Lilo & Stitch'],
-//     id: 2,
-//   },
-// ];
-
-// let movies = [
-//   {
-//     title: 'A Beautiful Mind',
-//     director: {
-//       name: 'Ron Howard',
-//     },
-//     year: '2001',
-//     genre: {
-//       name: 'Drama',
-//       description:
-//         'A drama is a genre that focuses on realistic characters, emotional themes, and intense, often personal conflicts to explore the human experience.',
-//     },
-//   },
-
-//   {
-//     title: 'The Lord of the Rings: The Return of the King',
-//     director: {
-//       name: 'Peter Jackson',
-//     },
-//     year: '2003',
-//     genre: {
-//       name: 'Fantasy',
-//       description:
-//         'Fantasy is a genre that features magical or supernatural elements set in imaginary worlds, often involving epic quests, mythical creatures, and heroic characters.',
-//     },
-//   },
-
-//   {
-//     title: 'No Country for Old Men',
-//     director: {
-//       name: 'Joel and Ethan Coen',
-//     },
-//     year: '2007',
-//     genre: {
-//       name: 'Thriller',
-//       description:
-//         'A thriller is a genre built around suspense, tension, and high stakes, keeping audiences on edge through twists, danger, and psychological intensity.',
-//     },
-//   },
-// ];
-
 const accessLogStream = fs.createWriteStream(path.join(__dirname, 'log.txt'), {
   flags: 'a',
 });
