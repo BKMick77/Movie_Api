@@ -9,9 +9,8 @@ mongoose.connect('mongodb://localhost:27017/movie_api', {
   useUnifiedTopology: true,
 });
 
-const express = require('express'),
-  morgan = require('morgan'),
-  uuid = require('uuid');
+const express = require('express');
+morgan = require('morgan');
 
 const fs = require('fs');
 const path = require('path');
