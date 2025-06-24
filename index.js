@@ -30,11 +30,6 @@ app.use(morgan('combined', { stream: accessLogStream }));
 
 app.use(express.static('public'));
 
-let auth = require('./auth')(app);
-
-const passport = require('passport');
-require('./passport');
-
 //Create user data
 // Format = json (mongoose)
 app.post('/users', async (req, res) => {
@@ -180,11 +175,8 @@ app.get('/movies', async (req, res) => {
 });
 
 //Read data of one movie (mongoose)
-app.get('/movies/:Title',
-
-  passport.authenticate('jwt', { session: false }),
-  async (req, res) => {
-
+app.get('/movies/:Title', async (req, res) => {
+  await Movies.findOne({ Title: req.params.Title })
     .then((movie) => {
       res.json(movie);
     })
