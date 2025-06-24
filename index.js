@@ -30,6 +30,11 @@ app.use(morgan('combined', { stream: accessLogStream }));
 
 app.use(express.static('public'));
 
+let auth = require('./auth')(app);
+
+const passport = require('passport');
+require('./passport');
+
 //Create user data
 // Format = json (mongoose)
 app.post('/users', async (req, res) => {
