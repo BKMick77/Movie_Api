@@ -9,11 +9,6 @@ mongoose.connect('mongodb://localhost:27017/movie_api', {
   useUnifiedTopology: true,
 });
 
-let auth = require('./auth')(app);
-
-const cors = require('cors');
-app.use(cors());
-
 const express = require('express'),
   morgan = require('morgan');
 
@@ -24,6 +19,11 @@ const app = express();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+let auth = require('./auth')(app);
+
+const cors = require('cors');
+app.use(cors());
 
 app.use(morgan('common'));
 
