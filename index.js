@@ -35,6 +35,8 @@ let auth = require('./auth')(app);
 const passport = require('passport');
 require('./passport');
 
+const requireAdmin = require('./admin');
+
 //Create user data
 // Format = json (mongoose)
 app.post('/users', async (req, res) => {
@@ -180,6 +182,7 @@ app.delete(
 app.get(
   '/users',
   passport.authenticate('jwt', { session: false }),
+  requireAdmin,
   async (req, res) => {
     if (req.user.Username !== req.params.Username) {
       return res.status(400).send('Permission Denied');
