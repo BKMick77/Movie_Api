@@ -243,7 +243,7 @@ app.get(
   }
 );
 
-//Read genre description (data mongoose)*
+//Read genre description (mongoose)*
 app.get(
   '/genre/:Name',
   passport.authenticate('jwt', { session: false }),
@@ -263,7 +263,7 @@ app.get(
   }
 );
 
-//Read director (data mongoose)*
+//Read director (mongoose)*
 app.get(
   '/director/:Name',
   passport.authenticate('jwt', { session: false }),
