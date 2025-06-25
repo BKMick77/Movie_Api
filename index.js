@@ -9,6 +9,11 @@ mongoose.connect('mongodb://localhost:27017/movie_api', {
   useUnifiedTopology: true,
 });
 
+let auth = require('./auth')(app);
+
+const cors = require('cors');
+app.use(cors());
+
 const express = require('express'),
   morgan = require('morgan');
 
@@ -29,8 +34,6 @@ const accessLogStream = fs.createWriteStream(path.join(__dirname, 'log.txt'), {
 app.use(morgan('combined', { stream: accessLogStream }));
 
 app.use(express.static('public'));
-
-let auth = require('./auth')(app);
 
 const passport = require('passport');
 require('./passport');
@@ -178,6 +181,7 @@ app.delete(
   }
 );
 
+// Get all user data -requires admin (mongoose)
 app.get(
   '/users',
   passport.authenticate('jwt', { session: false }),
