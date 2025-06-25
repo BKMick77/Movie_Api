@@ -50,6 +50,7 @@ app.post('/users', async (req, res) => {
           Password: req.body.Password,
           Email: req.body.Email,
           Birthday: req.body.Birthday,
+          Admin: req.body.Admin, //temp to add admin privielage
         })
           .then((user) => {
             res.status(201).json(user);
@@ -177,23 +178,18 @@ app.delete(
   }
 );
 
-//Read data of all users (mongoose)*
-//Needs Conditions that blocks all but admin?
 app.get(
   '/users',
   passport.authenticate('jwt', { session: false }),
   requireAdmin,
-  async (req, res) => {
-    if (req.user.Username !== req.params.Username) {
-      return res.status(400).send('Permission Denied');
-    }
-    await Users.find()
+  (req, res) => {
+    Users.find()
       .then((users) => {
         res.status(200).json(users);
       })
       .catch((err) => {
         console.error(err);
-        res.status(500).send('Error:' + err);
+        res.status(500).send('Error: ' + err);
       });
   }
 );
