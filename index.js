@@ -37,6 +37,11 @@ require('./passport');
 
 const requireAdmin = require('./admin');
 
+const logRequest = require('./logRequests');
+app.use(logRequest);
+
+const logger = require('./logger');
+
 //Create user data
 // Format = json (mongoose)
 app.post('/users', async (req, res) => {
@@ -54,9 +59,11 @@ app.post('/users', async (req, res) => {
           Admin: req.body.Admin, //temp to add admin privielage
         })
           .then((user) => {
+            logger.info(`User created: ${user.Username}`);
             res.status(201).json(user);
           })
           .catch((error) => {
+            logger.error(`Error creating user: ${error.message}`);
             console.error(error);
             res.status(500).send('Error:' + error);
           });
@@ -95,6 +102,7 @@ app.put(
       { new: true, runValidators: true }
     )
       .then((updateUser) => {
+        logger.info(`User updated: ${user.Username}`);
         res.json(updateUser);
       })
       .catch((err) => {
@@ -102,6 +110,7 @@ app.put(
           const message = Object.values(err.error).map((e) => e.message);
           return res.status(400).json({ errors: message });
         }
+        logger.error(`Error during user update: ${err.message}`);
         console.error(err);
         res.status(500).send('Error:' + err);
       });
@@ -125,9 +134,15 @@ app.post(
       { new: true }
     )
       .then((updateUser) => {
+        logger.info(
+          `Movie "${movieId}" added to user ${req.params.Username}'s list`
+        );
         res.json(updateUser);
       })
       .catch((err) => {
+        logger.error(
+          `Error adding movie ${req.params.MovieID} from ${req.params.Username}: ${err.message}`
+        );
         console.error(err);
         res.status(500).send('Error' + err);
       });
@@ -152,12 +167,18 @@ app.delete(
         if (!updatedUser) {
           res.status(404).send('User not found.');
         } else {
+          logger.info(
+            `Movie ${req.params.MovieID} removed from ${req.params.Username}'s favorites`
+          );
           res
             .status(200)
             .send(`Movie ${req.params.MovieID} was removed from favorites.`);
         }
       })
       .catch((err) => {
+        logger.error(
+          `Error removing movie ${req.params.MovieID} to ${req.params.Username}: ${err.message}`
+        );
         console.error(err);
         res.status(500).send('Error: ' + err);
       });
@@ -178,9 +199,11 @@ app.delete(
         if (!deletedUser) {
           return res.status(404).send(`${req.params.Username} was not found.`);
         }
+        logger.info(`User deleted: ${req.params.Username}`);
         res.status(200).send(`${req.params.Username} was deleted.`);
       })
       .catch((err) => {
+        logger.error(`Error deleting user: ${error.message}`);
         console.error(err);
         res.status(500).send('Error:' + err);
       });
