@@ -40,6 +40,7 @@ const requireAdmin = require('./admin');
 //Create user data
 // Format = json (mongoose)
 app.post('/users', async (req, res) => {
+  let hashedPassword = Users.hashedPassword(req.body.Password);
   await Users.findOne({ Username: req.body.Username })
     .then((user) => {
       if (user) {
@@ -47,7 +48,7 @@ app.post('/users', async (req, res) => {
       } else {
         Users.create({
           Username: req.body.Username,
-          Password: req.body.Password,
+          Password: hashedPassword,
           Email: req.body.Email,
           Birthday: req.body.Birthday,
           Admin: req.body.Admin, //temp to add admin privielage
