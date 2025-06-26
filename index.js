@@ -59,12 +59,9 @@ app.post('/users', async (req, res) => {
         'Password must be at least 8 characters long and contain a letter and a number or special character.'
       );
   }
-
   const hashedPassword = Users.hashPassword(rawPassword);
-
   try {
     const existingUser = await Users.findOne({ Username: req.body.Username });
-
     if (existingUser) {
       return res.status(400).send(`${req.body.Username} already exists`);
     }
