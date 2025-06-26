@@ -4,10 +4,7 @@ const models = require('./models.js');
 const Movies = models.Movie;
 const Users = models.User;
 
-mongoose.connect('mongodb://localhost:27017/movie_api', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
+mongoose.connect('mongodb://localhost:27017/movie_api');
 
 const express = require('express'),
   morgan = require('morgan');
