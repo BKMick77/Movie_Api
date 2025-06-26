@@ -1,2 +1,4 @@
 log.txt
 .prettierrc
+logfile.log
+*.log
