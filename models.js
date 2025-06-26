@@ -19,9 +19,28 @@ let movieSchema = mongoose.Schema({
 });
 
 let userSchema = mongoose.Schema({
-  Username: { type: String, required: true },
-  Password: { type: String, required: true },
-  Email: { type: String, required: true },
+  username: {
+    type: String,
+    required: true,
+    match: [
+      /^[a-zA-Z0-9_]{3,20}$/,
+      'Error: No special characters allowed in username.',
+    ],
+  },
+  password: {
+    type: String,
+    required: true,
+    minlength: [8, 'Error: Password must be at least 8 characters'],
+    match: [
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+$/,
+      'Error: Password must include uppercase, lowercase, number, and special character',
+    ],
+  },
+  email: {
+    type: String,
+    required: true,
+    match: [/^[^\s@]+@[^\s@]+\.[^\s@]+$/, 'Error: Must format as email'],
+  },
   Birthday: Date,
   FavoriteMovies: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Movie' }],
   Admin: { type: Boolean, default: false },
