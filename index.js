@@ -42,41 +42,53 @@ app.use(logRequest);
 
 const logger = require('./logger');
 
-//Create user data
+// Create user data
 // Format = json (mongoose)
+// TODO: refactored to async/await try...catch - REFACTOR ALL ROUTES!
+// implement express async handeler/global error handler
 app.post('/users', async (req, res) => {
-  let hashedPassword = Users.hashPassword(req.body.Password);
-  await Users.findOne({ Username: req.body.Username })
-    .then((user) => {
-      if (user) {
-        return res.status(400).send(req.body.Username + 'already exists');
-      } else {
-        Users.create({
-          Username: req.body.Username,
-          Password: hashedPassword,
-          Email: req.body.Email,
-          Birthday: req.body.Birthday,
-          Admin: req.body.Admin, //temp to add admin privielage
-        })
-          .then((user) => {
-            logger.info(`User created: ${user.Username}`);
-            res.status(201).json(user);
-          })
-          .catch((error) => {
-            logger.error(`Error creating user: ${error.message}`);
-            console.error(error);
-            res.status(500).send('Error:' + error);
-          });
-      }
-    })
-    .catch((error) => {
-      if (err.name === 'ValidationError') {
-        const message = Object.values(err.error).map((e) => e.message);
-        return res.status(400).json({ errors: message });
-      }
-      console.error(error);
-      res.status(500).send('Error:' + error);
+  const rawPassword = req.body.Password;
+
+  // Validate password before hashing --not in user schema
+  if (
+    !/^(?=.*[A-Za-z])(?=.*\d|[^A-Za-z\d])[A-Za-z\d\W]{8,}$/.test(rawPassword)
+  ) {
+    return res
+      .status(400)
+      .send(
+        'Password must be at least 8 characters long and contain a letter and a number or special character.'
+      );
+  }
+
+  const hashedPassword = Users.hashPassword(rawPassword);
+
+  try {
+    const existingUser = await Users.findOne({ Username: req.body.Username });
+
+    if (existingUser) {
+      return res.status(400).send(`${req.body.Username} already exists`);
+    }
+
+    const newUser = await Users.create({
+      Username: req.body.Username,
+      Password: hashedPassword,
+      Email: req.body.Email,
+      Birthday: req.body.Birthday,
+      //Admin: req.body.Admin, // temp to add admin privilege
     });
+
+    logger.info(`User created: ${newUser.Username}`);
+    res.status(201).json(newUser);
+  } catch (error) {
+    if (error.name === 'ValidationError') {
+      const message = Object.values(error.errors).map((e) => e.message);
+      return res.status(400).json({ errors: message });
+    }
+
+    logger.error(`Error creating user: ${error.message}`);
+    console.error(error);
+    res.status(500).send('Error: ' + error);
+  }
 });
 
 //Update user data (mongoose)*
