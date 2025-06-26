@@ -30,11 +30,6 @@ let userSchema = mongoose.Schema({
   Password: {
     type: String,
     required: true,
-    minlength: [8, 'Error: Password must be at least 8 characters'],
-    match: [
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+$/,
-      'Error: Password must include uppercase, lowercase, number, and special character',
-    ],
   },
   Email: {
     type: String,
