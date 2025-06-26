@@ -19,7 +19,7 @@ let movieSchema = mongoose.Schema({
 });
 
 let userSchema = mongoose.Schema({
-  username: {
+  Username: {
     type: String,
     required: true,
     match: [
@@ -27,7 +27,7 @@ let userSchema = mongoose.Schema({
       'Error: No special characters allowed in username.',
     ],
   },
-  password: {
+  Password: {
     type: String,
     required: true,
     minlength: [8, 'Error: Password must be at least 8 characters'],
@@ -36,7 +36,7 @@ let userSchema = mongoose.Schema({
       'Error: Password must include uppercase, lowercase, number, and special character',
     ],
   },
-  email: {
+  Email: {
     type: String,
     required: true,
     match: [/^[^\s@]+@[^\s@]+\.[^\s@]+$/, 'Error: Must format as email'],
