@@ -63,6 +63,10 @@ app.post('/users', async (req, res) => {
       }
     })
     .catch((error) => {
+      if (err.name === 'ValidationError') {
+        const message = Object.values(err.error).map((e) => e.message);
+        return res.status(400).json({ errors: message });
+      }
       console.error(error);
       res.status(500).send('Error:' + error);
     });
@@ -88,12 +92,16 @@ app.put(
           Birthday: req.body.Birthday,
         },
       },
-      { new: true }
+      { new: true, runValidators: true }
     )
       .then((updateUser) => {
         res.json(updateUser);
       })
       .catch((err) => {
+        if (err.name === 'ValidationError') {
+          const message = Object.values(err.error).map((e) => e.message);
+          return res.status(400).json({ errors: message });
+        }
         console.error(err);
         res.status(500).send('Error:' + err);
       });
