@@ -45,7 +45,7 @@ const logger = require('./logger');
 //Create user data
 // Format = json (mongoose)
 app.post('/users', async (req, res) => {
-  let hashedPassword = Users.hashedPassword(req.body.Password);
+  let hashedPassword = Users.hashPassword(req.body.Password);
   await Users.findOne({ Username: req.body.Username })
     .then((user) => {
       if (user) {
@@ -110,7 +110,7 @@ app.put(
           const message = Object.values(err.error).map((e) => e.message);
           return res.status(400).json({ errors: message });
         }
-        logger.error(`Error during user update: ${err.message}`);
+        logger.error(`Error during user update: ${error.message}`);
         console.error(err);
         res.status(500).send('Error:' + err);
       });
@@ -135,7 +135,7 @@ app.post(
     )
       .then((updateUser) => {
         logger.info(
-          `Movie "${movieId}" added to user ${req.params.Username}'s list`
+          `Movie "${req.params.MovieId}" added to user ${req.params.Username}'s list`
         );
         res.json(updateUser);
       })
