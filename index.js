@@ -6,7 +6,7 @@ const models = require('./models.js');
 const Movies = models.Movie;
 const Users = models.User;
 
-mongoose.connect('mongodb://localhost:27017/movie_api');
+mongoose.connect(process.env.MONGODB_URI);
 
 const express = require('express'),
   morgan = require('morgan');
