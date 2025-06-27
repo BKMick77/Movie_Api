@@ -5,6 +5,8 @@ const jwt = require('jsonwebtoken'),
 
 require('./passport');
 
+const logger = require('./logger');
+
 let generateJWTToken = (user) => {
   return jwt.sign(user, jwtSecret, {
     subject: user.Username, // JWT encoded username
@@ -28,6 +30,7 @@ module.exports = (router) => {
           res.send(error);
         }
         let token = generateJWTToken(user.toJSON());
+        logger.info(`User logged in: ${user.Username}`);
         return res.json({ user, token });
       });
     })(req, res);
