@@ -24,14 +24,6 @@ let auth = require('./auth')(app);
 const cors = require('cors');
 app.use(cors());
 
-app.use(morgan('common'));
-
-const accessLogStream = fs.createWriteStream(path.join(__dirname, 'log.txt'), {
-  flags: 'a',
-});
-
-app.use(morgan('combined', { stream: accessLogStream }));
-
 app.use(express.static('public'));
 
 const passport = require('passport');
@@ -39,10 +31,14 @@ require('./passport');
 
 const requireAdmin = require('./admin');
 
-const logRequest = require('./logRequests');
-app.use(logRequest);
-
 const logger = require('./logger');
+app.use(
+  morgan('combined', {
+    stream: {
+      write: (message) => logger.http(message.trim()),
+    },
+  })
+);
 
 // Create user data
 // Format = json (mongoose)
@@ -76,7 +72,7 @@ app.post('/users', async (req, res) => {
       Password: hashedPassword,
       Email: req.body.Email,
       Birthday: req.body.Birthday,
-      Admin: isAdmin,
+      Admin: isAdmin, //adminSecret:
     });
 
     logger.info(`User created: ${newUser.Username}`);
