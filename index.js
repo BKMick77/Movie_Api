@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 const mongoose = require('mongoose');
 const models = require('./models.js');
 
@@ -45,7 +47,7 @@ const logger = require('./logger');
 // Create user data
 // Format = json (mongoose)
 // TODO: refactored to async/await try...catch - REFACTOR ALL ROUTES!
-// implement express async handeler/global error handler
+// implement express async handler/global error handler
 app.post('/users', async (req, res) => {
   const rawPassword = req.body.Password;
 
@@ -60,6 +62,9 @@ app.post('/users', async (req, res) => {
       );
   }
   const hashedPassword = Users.hashPassword(rawPassword);
+
+  const isAdmin = req.body.adminSecret === process.env.ADMIN_SECRET;
+
   try {
     const existingUser = await Users.findOne({ Username: req.body.Username });
     if (existingUser) {
@@ -71,7 +76,7 @@ app.post('/users', async (req, res) => {
       Password: hashedPassword,
       Email: req.body.Email,
       Birthday: req.body.Birthday,
-      //Admin: req.body.Admin, // temp to add admin privilege
+      Admin: isAdmin,
     });
 
     logger.info(`User created: ${newUser.Username}`);
@@ -89,40 +94,62 @@ app.post('/users', async (req, res) => {
 });
 
 //Update user data (mongoose)*
-//Format json
+//Format json async/await hashedPassword/Admin
 app.put(
   '/users/:Username',
   passport.authenticate('jwt', { session: false }),
   async (req, res) => {
-    // Condition to check credentials
+    // Check if user is authorized to update
     if (req.user.Username !== req.params.Username) {
       return res.status(400).send('Permission Denied');
     }
-    await Users.findOneAndUpdate(
-      { Username: req.params.Username },
-      {
-        $set: {
-          Username: req.body.Username,
-          Password: req.body.Password,
-          Email: req.body.Email,
-          Birthday: req.body.Birthday,
-        },
-      },
-      { new: true, runValidators: true }
-    )
-      .then((updateUser) => {
-        logger.info(`User updated: ${user.Username}`);
-        res.json(updateUser);
-      })
-      .catch((err) => {
-        if (err.name === 'ValidationError') {
-          const message = Object.values(err.error).map((e) => e.message);
-          return res.status(400).json({ errors: message });
+
+    try {
+      // update object
+      const updatedFields = {
+        Username: req.body.Username,
+        Email: req.body.Email,
+        Birthday: req.body.Birthday,
+        Admin: req.body.adminSecret === process.env.ADMIN_SECRET,
+      };
+
+      // validate & hash
+      if (req.body.Password) {
+        const rawPassword = req.body.Password;
+
+        if (
+          !/^(?=.*[A-Za-z])(?=.*\d|[^A-Za-z\d])[A-Za-z\d\W]{8,}$/.test(
+            rawPassword
+          )
+        ) {
+          return res
+            .status(400)
+            .send(
+              'Password must be at least 8 characters long and contain a letter and a number or special character.'
+            );
         }
-        logger.error(`Error during user update: ${error.message}`);
-        console.error(err);
-        res.status(500).send('Error:' + err);
-      });
+
+        updatedFields.Password = Users.hashPassword(rawPassword);
+      }
+
+      const updatedUser = await Users.findOneAndUpdate(
+        { Username: req.params.Username },
+        { $set: updatedFields },
+        { new: true, runValidators: true }
+      );
+
+      logger.info(`User updated: ${updatedUser.Username}`);
+      res.json(updatedUser);
+    } catch (error) {
+      if (error.name === 'ValidationError') {
+        const message = Object.values(error.errors).map((e) => e.message);
+        return res.status(400).json({ errors: message });
+      }
+
+      logger.error(`Error during user update: ${error.message}`);
+      console.error(error);
+      res.status(500).send('Error: ' + error);
+    }
   }
 );
 
@@ -326,7 +353,7 @@ app.get(
 
 app.use((err, req, res, _next) => {
   console.error(err.stack);
-  res.status(500).send("🚨It's Broken🚨");
+  res.status(500).send('🚨 Something went wrong 🚨');
 });
 
 const port = process.env.PORT || 8080;
