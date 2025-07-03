@@ -6,7 +6,12 @@ const models = require('./models.js');
 const Movies = models.Movie;
 const Users = models.User;
 
-mongoose.connect(process.env.MONGODB_URI);
+mongoose
+  .connect(process.env.MONGODB_URI)
+  .then(() => console.log('✅ MongoDB connected locally'))
+  .catch((err) => {
+    console.error('❌ Mongoose connection failed:', err.message);
+  });
 
 const express = require('express'),
   morgan = require('morgan');
