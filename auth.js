@@ -7,6 +7,8 @@ require('./passport');
 
 const logger = require('./logger');
 
+const cors = require('cors');
+
 let generateJWTToken = (user) => {
   return jwt.sign(user, jwtSecret, {
     subject: user.Username, // JWT encoded username
@@ -17,7 +19,7 @@ let generateJWTToken = (user) => {
 
 /* POST login. */
 module.exports = (router) => {
-  router.post('/login', (req, res) => {
+  router.post('/login', cors(), (req, res) => {
     passport.authenticate('local', { session: false }, (error, user, info) => {
       if (error || !user) {
         return res.status(400).json({
