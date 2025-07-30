@@ -265,20 +265,24 @@ app.get(
 );
 
 //Read data of one user (mongoose)
-app.get('/users/:Username', async (req, res) => {
-  // Condition to check credentials
-  if (req.user.Username !== req.params.Username) {
-    return res.status(400).send('Permission Denied');
+app.get(
+  '/users/:Username',
+  passport.authenticate('jwt', { session: false }),
+  async (req, res) => {
+    // Condition to check credentials
+    if (req.user.Username !== req.params.Username) {
+      return res.status(400).send('Permission Denied');
+    }
+    await Users.findOne({ Username: req.params.Username })
+      .then((user) => {
+        res.json(user);
+      })
+      .catch((err) => {
+        console.error(err);
+        res.status(500).send('Error:' + err);
+      });
   }
-  await Users.findOne({ Username: req.params.Username })
-    .then((user) => {
-      res.json(user);
-    })
-    .catch((err) => {
-      console.error(err);
-      res.status(500).send('Error:' + err);
-    });
-});
+);
 
 //Read data of all movies (mongoose)*
 app.get(
