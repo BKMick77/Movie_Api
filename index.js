@@ -396,7 +396,7 @@ app.put(
     try {
       const updatedMovie = await Movies.findByIdAndUpdate(
         req.params.MovieId,
-        { $set: { BackdropImage: req.body.BackdropImage } },
+        { $set: { BackdropPath: req.body.BackdropPath } },
         { new: true }
       );
 
