@@ -74,6 +74,10 @@ app.post('/users', async (req, res) => {
       return res.status(400).send(`${req.body.Username} already exists`);
     }
 
+    console.log('Admin Secret (env):', process.env.ADMIN_SECRET);
+    console.log('Admin Secret (sent):', req.body.adminSecret);
+    console.log('isAdmin resolves to:', isAdmin);
+
     const newUser = await Users.create({
       Username: req.body.Username,
       Password: hashedPassword,
