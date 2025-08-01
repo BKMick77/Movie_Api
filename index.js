@@ -45,6 +45,8 @@ app.use(
   })
 );
 
+console.log('Admin secret in memory:', process.env.ADMIN_SECRET);
+
 // Create user data
 // Format = json (mongoose)
 // TODO: refactored to async/await try...catch - REFACTOR ALL ROUTES!
