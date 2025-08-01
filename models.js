@@ -17,6 +17,8 @@ let movieSchema = mongoose.Schema({
 
   ImagePath: String,
 
+  BackdropPath: String,
+
   Featured: Boolean,
 
   WatchLinks: {

@@ -387,6 +387,31 @@ app.put(
   }
 );
 
+// Add a movie backdrop (Admin only)
+app.put(
+  '/movies/:MovieId/backdrop',
+  passport.authenticate('jwt', { session: false }),
+  requireAdmin,
+  async (req, res) => {
+    try {
+      const updatedMovie = await Movies.findByIdAndUpdate(
+        req.params.MovieId,
+        { $set: { BackdropImage: req.body.BackdropImage } },
+        { new: true }
+      );
+
+      if (!updatedMovie) {
+        return res.status(404).send('Movie not found.');
+      }
+
+      res.json(updatedMovie);
+    } catch (err) {
+      console.error(err);
+      res.status(500).send('Error: ' + err);
+    }
+  }
+);
+
 // Add comments (movie view react)
 app.post(
   '/movies/:MovieId/comments',
