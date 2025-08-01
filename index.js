@@ -356,6 +356,87 @@ app.get(
   }
 );
 
+// Add "WatchLinks" field for a movie (Admin only)
+app.put(
+  '/movies/:MovieId/watchlinks',
+  passport.authenticate('jwt', { session: false }),
+  requireAdmin,
+  async (req, res) => {
+    try {
+      const updatedMovie = await Movies.findByIdAndUpdate(
+        req.params.MovieId,
+        { $set: { WatchLinks: req.body } },
+        { new: true }
+      );
+
+      if (!updatedMovie) {
+        return res.status(404).send('Movie not found.');
+      }
+
+      res.json(updatedMovie);
+    } catch (err) {
+      console.error(err);
+      res.status(500).send('Error: ' + err);
+    }
+  }
+);
+
+// Add comments (movie view react)
+app.post(
+  '/movies/:MovieId/comments',
+  passport.authenticate('jwt', { session: false }),
+  async (req, res) => {
+    try {
+      const { Content } = req.body;
+      const Username = req.user.Username;
+
+      if (!Content) {
+        return res.status(400).send('Comment content is required.');
+      }
+
+      const updatedMovie = await Movies.findByIdAndUpdate(
+        req.params.MovieId,
+        {
+          $push: {
+            Comments: {
+              Username,
+              Content,
+              PostedAt: new Date(),
+            },
+          },
+        },
+        { new: true }
+      );
+
+      if (!updatedMovie) {
+        return res.status(404).send('Movie not found.');
+      }
+
+      res.json(updatedMovie);
+    } catch (error) {
+      console.error(error);
+      res.status(500).send('Error: ' + error);
+    }
+  }
+);
+
+// Seperate GET just for comments
+app.get(
+  '/movies/:MovieId/comments',
+  passport.authenticate('jwt', { session: false }),
+  async (req, res) => {
+    try {
+      const movie = await Movies.findById(req.params.MovieId);
+      if (!movie) return res.status(404).send('Movie not found.');
+
+      res.json(movie.Comments);
+    } catch (error) {
+      console.error(error);
+      res.status(500).send('Error: ' + error);
+    }
+  }
+);
+
 app.get('/', (req, res) => {
   res.send('Welcome to MyFlix API');
 });

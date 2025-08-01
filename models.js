@@ -14,8 +14,24 @@ let movieSchema = mongoose.Schema({
     Bio: String,
   },
   Actors: [String],
+
   ImagePath: String,
+
   Featured: Boolean,
+
+  WatchLinks: {
+    AppleTV: { type: String },
+    AmazonPrime: { type: String },
+  },
+
+  Comments: [
+    {
+      Username: { type: String, required: true },
+      Content: { type: String, required: true },
+      Rating: { type: Number, required: true, min: 1, max: 5 },
+      PostedAt: { type: Date, default: Date.now },
+    },
+  ],
 });
 
 let userSchema = mongoose.Schema({
