@@ -54,7 +54,7 @@ let userSchema = mongoose.Schema({
   },
   Birthday: Date,
   FavoriteMovies: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Movie' }],
-  Admin: { type: Boolean, default: false },
+  Admin: { type: Boolean },
 });
 
 userSchema.statics.hashPassword = (password) => {
