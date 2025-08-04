@@ -120,25 +120,33 @@ app.put(
         Admin: req.body.adminSecret === process.env.ADMIN_SECRET,
       };
 
-      // validate & hash
-      if (req.body.Password) {
-        const rawPassword = req.body.Password;
+      //Validate currentPassword New password & hash
+      if (req.body.newPassword) {
+        const userFromDb = await Users.findOne({
+          Username: req.params.Username,
+        });
+
+        const isMatch = await bcrypt.compare(
+          req.body.currentPassword,
+          userFromDb.Password
+        );
+
+        if (!isMatch) {
+          return res.status(401).send('Current password is incorrect');
+        }
 
         if (
           !/^(?=.*[A-Za-z])(?=.*\d|[^A-Za-z\d])[A-Za-z\d\W]{8,}$/.test(
-            rawPassword
+            req.body.newPassword
           )
         ) {
           return res
             .status(400)
-            .send(
-              'Password must be at least 8 characters long and contain a letter and a number or special character.'
-            );
+            .send('New password does not meet complexity requirements.');
         }
 
-        updatedFields.Password = Users.hashPassword(rawPassword);
+        updatedFields.Password = Users.hashPassword(req.body.newPassword);
       }
-
       const updatedUser = await Users.findOneAndUpdate(
         { Username: req.params.Username },
         { $set: updatedFields },
