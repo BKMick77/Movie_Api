@@ -45,6 +45,8 @@ app.use(
   })
 );
 
+const bcrypt = require('bcrypt');
+
 console.log('Admin secret in memory:', process.env.ADMIN_SECRET);
 
 // Create user data
