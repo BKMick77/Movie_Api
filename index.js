@@ -306,6 +306,7 @@ app.get(
   passport.authenticate('jwt', { session: false }),
   async (req, res) => {
     await Movies.find()
+      .sort({ ReleaseYear: 1 })
       .then((movies) => {
         res.status(200).json(movies);
       })
