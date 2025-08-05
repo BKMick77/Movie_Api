@@ -34,6 +34,8 @@ let movieSchema = mongoose.Schema({
       PostedAt: { type: Date, default: Date.now },
     },
   ],
+
+  ReleaseYear: Number,
 });
 
 let userSchema = mongoose.Schema({
