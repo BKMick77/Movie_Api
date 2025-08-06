@@ -35,6 +35,14 @@ let movieSchema = mongoose.Schema({
     },
   ],
 
+  RottonTomatoes: [
+    {
+      Score: { type: String, required: true },
+      NumericScore: { type: Number, required: true },
+      Link: { type: String, required: true },
+    },
+  ],
+
   ReleaseYear: Number,
 });
 

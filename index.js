@@ -448,6 +448,38 @@ app.put(
   }
 );
 
+app.put(
+  '/movies/:MovieId/rottontomatoes',
+  passport.authenticate('jwt', { session: false }),
+  requireAdmin,
+  async (req, res) => {
+    const { score, numericscore, link } = req.body;
+
+    try {
+      const updatedMovie = await Movies.findByIdAndUpdate(
+        req.params.MovieId,
+        {
+          $set: {
+            RottonTomatoes: [
+              { Score: score, NumericScore: numericscore, Link: link },
+            ],
+          },
+        },
+        { new: true }
+      );
+
+      if (!updatedMovie) {
+        return res.status(404).send('Movie not found.');
+      }
+
+      res.json(updatedMovie);
+    } catch (err) {
+      console.error(err);
+      res.status(500).send('Error: ' + err);
+    }
+  }
+);
+
 // Add comments (movie view react)
 app.post(
   '/movies/:MovieId/comments',
