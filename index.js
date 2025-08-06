@@ -27,7 +27,28 @@ app.use(express.urlencoded({ extended: true }));
 let auth = require('./auth')(app);
 
 const cors = require('cors');
-app.use(cors());
+let allowedOrigins = [
+  'http://localhost:1234',
+  'https://scene2screen.netlify.app',
+  'https://scene2screen.dev',
+  'https://www.scene2screen.dev',
+  'https://candid-kleicha-7d97d9.netlify.app',
+];
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.indexOf(origin) === -1) {
+        // If a specific origin isn’t found on the list of allowed origins
+        let message =
+          'The CORS policy for this application doesn’t allow access from origin ' +
+          origin;
+        return callback(new Error(message), false);
+      }
+      return callback(null, true);
+    },
+  })
+);
 
 app.use(express.static('public'));
 
@@ -423,6 +444,30 @@ app.put(
   }
 );
 
+//PUT for director image
+app.put(
+  '/directors/:Name/image',
+  passport.authenticate('jwt', { session: false }),
+  requireAdmin,
+  async (req, res) => {
+    try {
+      const updatedDirector = await Directors.findOneAndUpdate(
+        { Name: req.params.Name },
+        { $set: { Image: req.body.Image } },
+        { new: true }
+      );
+
+      if (!updatedDirector) {
+        return res.status(404).send('Director not found.');
+      }
+
+      res.json(updatedDirector);
+    } catch (err) {
+      console.error(err);
+      res.status(500).send('Error: ' + err);
+    }
+  }
+);
 // Add release year
 app.put(
   '/movies/:MovieId/year',
