@@ -451,7 +451,7 @@ app.put(
   requireAdmin,
   async (req, res) => {
     try {
-      const updatedMovie = await Movies.findOneAndUpdate(
+      const updatedMovie = await Movies.updateMany(
         { 'Director.Name': req.params.Name },
         { $set: { 'Director.Image': req.body.Image } },
         { new: true }
