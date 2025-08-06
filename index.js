@@ -451,20 +451,20 @@ app.put(
   requireAdmin,
   async (req, res) => {
     try {
-      const updatedDirector = await Directors.findOneAndUpdate(
-        { Name: req.params.Name },
-        { $set: { Image: req.body.Image } },
+      const updatedMovie = await Movies.findOneAndUpdate(
+        { 'Director.Name': req.params.Name },
+        { $set: { 'Director.Image': req.body.Image } },
         { new: true }
       );
 
-      if (!updatedDirector) {
+      if (!updatedMovie) {
         return res.status(404).send('Director not found.');
       }
 
-      res.json(updatedDirector);
+      res.json(updatedMovie);
     } catch (err) {
       console.error(err);
-      res.status(500).send('Error: ' + err);
+      res.status(500).send('Error: ' + err.message);
     }
   }
 );
