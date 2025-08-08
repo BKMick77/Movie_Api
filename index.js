@@ -444,31 +444,33 @@ app.put(
   }
 );
 
-//PUT for director image
+//
+// Update director fields by director name updateMany
 app.put(
-  '/directors/:Name/image',
+  '/movies/director/:name',
   passport.authenticate('jwt', { session: false }),
   requireAdmin,
   async (req, res) => {
-    try {
-      const updatedMovie = await Movies.updateMany(
-        { 'Director.Name': req.params.Name },
-        { $set: { 'Director.Image': req.body.Image } },
-        { new: true }
-      );
+    const { name } = req.params;
+    const { Bio, Birth, Image } = req.body;
 
-      if (!updatedMovie) {
-        return res.status(404).send('Director not found.');
-      }
+    const $set = {};
+    if (Bio !== undefined) $set['Director.Bio'] = Bio;
+    if (Birth !== undefined) $set['Director.Birth'] = Birth;
+    if (Image !== undefined) $set['Director.Image'] = Image;
 
-      res.json(updatedMovie);
-    } catch (err) {
-      console.error(err);
-      res.status(500).send('Error: ' + err.message);
+    if (!Object.keys($set).length) {
+      return res.status(400).json({ error: 'Nothing to update' });
     }
+
+    const result = await Movies.updateMany({ 'Director.Name': name }, { $set });
+
+    return res.json({
+      matched: result.matchedCount ?? result.nMatched,
+      modified: result.modifiedCount ?? result.nModified,
+    });
   }
-);
-// Add release year
+); // Add release year
 app.put(
   '/movies/:MovieId/year',
   passport.authenticate('jwt', { session: false }),
