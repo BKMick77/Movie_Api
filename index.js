@@ -8,9 +8,9 @@ const Users = models.User;
 
 mongoose
   .connect(process.env.MONGODB_URI)
-  .then(() => console.log('✅ MongoDB connected locally'))
+  .then(() => console.log('MongoDB connected locally'))
   .catch((err) => {
-    console.error('❌ Mongoose connection failed:', err.message);
+    console.error('Mongoose connection failed:', err.message);
   });
 
 const express = require('express'),
